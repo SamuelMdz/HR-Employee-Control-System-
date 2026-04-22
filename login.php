@@ -2,10 +2,9 @@
 require_once "config.php";
 session_start();
 
-//If already logged in, skip the login page
 if (isset($_SESSION["user_id"])) {
     header("Location: dashboard.php");
-    exit();
+    exit;
 }
 
 $error = "";
@@ -14,49 +13,146 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = $_POST["username"];
     $password = $_POST["password"];
 
-    $sql = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
+    $sql    = "SELECT * FROM users WHERE username = '$username' AND password = '$password'";
     $result = mysqli_query($conn, $sql);
-    $user = mysqli_fetch_assoc($result);
+    $user   = mysqli_fetch_assoc($result);
 
     if ($user) {
-        $_SESSION["user_id"] = $user["id"];
+        $_SESSION["user_id"]  = $user["id"];
         $_SESSION["username"] = $user["username"];
-        $_SESSION["role"] = $user["role"];
-
-
+        $_SESSION["role"]     = $user["role"];
         header("Location: dashboard.php");
         exit;
     } else {
         $error = "Invalid username or password.";
     }
-
 }
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Login — HR-ECS</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #1A2E4A 0%, #2E4A6E 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .login-card {
+      background: white;
+      border-radius: 16px;
+      padding: 40px 32px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .login-logo {
+      width: 60px;
+      height: 60px;
+      background: #2E7DF7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .login-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A2E4A;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      text-align: center;
+      font-size: 13px;
+      color: #5A6A7A;
+      margin-bottom: 28px;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 10px;
+      background: #2E7DF7;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+
+    .login-btn:hover {
+      background: #1A6AE0;
+    }
+
+    .demo-box {
+      background: #EAF1FE;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 12px;
+      color: #5A6A7A;
+      margin-top: 20px;
+      line-height: 1.8;
+    }
+
+    .demo-box strong {
+      color: #1A2E4A;
+    }
+  </style>
 </head>
 <body>
 
-  <h1>HR-ECS Login</h1>
+  <div class="login-card">
 
-  <?php if ($error): ?>
-    <p style="color: red;"><?php echo $error; ?></p>
-  <?php endif; ?>
+    <div class="login-logo">HR</div>
+    <h1 class="login-title">HR-ECS</h1>
+    <p class="login-subtitle">Your Workforce, Organized.</p>
 
-  <form method="POST" action="login.php">
+    <?php if ($error): ?>
+      <div class="alert alert-error"><?php echo $error; ?></div>
+    <?php endif; ?>
 
-    <label>Username</label><br>
-    <input type="text" name="username"><br><br>
+    <form method="POST" action="login.php">
 
-    <label>Password</label><br>
-    <input type="password" name="password"><br><br>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username"
+               placeholder="Enter your username" autofocus>
+      </div>
 
-    <button type="submit">Sign In</button>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password"
+               placeholder="Enter your password">
+      </div>
 
-  </form>
+      <button type="submit" class="login-btn">Sign In</button>
+
+    </form>
+
+    <div class="demo-box">
+      <strong>Demo accounts</strong><br>
+      Admin: alice / admin123<br>
+      Manager: bob / manager123<br>
+      Employee: carol / employee123
+    </div>
+
+  </div>
 
 </body>
 </html>

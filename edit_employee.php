@@ -10,17 +10,12 @@ if (!isset($_SESSION["user_id"])) {
 $error   = "";
 $success = "";
 
-// Get the employee ID from the URL
-$id = $_GET["id"];
-
-// Fetch the employee's current data
-$sql    = "SELECT * FROM employees WHERE id = '$id'";
-$result = mysqli_query($conn, $sql);
+$id       = $_GET["id"];
+$sql      = "SELECT * FROM employees WHERE id = '$id'";
+$result   = mysqli_query($conn, $sql);
 $employee = mysqli_fetch_assoc($result);
 
-// Handle form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     $name      = $_POST["name"];
     $job_title = $_POST["job_title"];
     $status    = $_POST["status"];
@@ -28,15 +23,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($name) || empty($job_title) || empty($status)) {
         $error = "All fields are required.";
     } else {
-        $sql    = "UPDATE employees 
+        $sql    = "UPDATE employees
                    SET name = '$name', job_title = '$job_title', status = '$status'
                    WHERE id = '$id'";
         $result = mysqli_query($conn, $sql);
 
         if ($result) {
             $success = "Employee updated successfully!";
+            $result   = mysqli_query($conn, "SELECT * FROM employees WHERE id = '$id'");
+            $employee = mysqli_fetch_assoc($result);
         } else {
-            $error = "Something went wrong. MySQL error: " . mysqli_error($conn);
+            $error = "Something went wrong. " . mysqli_error($conn);
         }
     }
 }
@@ -45,47 +42,99 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Edit Employee — HR-ECS</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <h1>Edit Employee</h1>
-  <a href="employees.php">Back to Employees</a>
-  <br><br>
+<div class="page-wrapper">
 
-  <?php if ($error): ?>
-    <p style="color: red;"><?php echo $error; ?></p>
-  <?php endif; ?>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">HR</div>
+      <span>HR-ECS</span>
+    </div>
+    <nav>
+      <a href="dashboard.php">Dashboard</a>
+      <?php if ($_SESSION["role"] == "admin" || $_SESSION["role"] == "manager"): ?>
+        <a href="employees.php" class="active">Employees</a>
+      <?php endif; ?>
+      <a href="leave.php">Leave Requests</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="logout.php">Logout</a>
+    </div>
+  </aside>
 
-  <?php if ($success): ?>
-    <p style="color: green;"><?php echo $success; ?></p>
-  <?php endif; ?>
+  <!-- Main content -->
+  <div class="main-content">
 
-  <form method="POST" action="edit_employee.php?id=<?php echo $id; ?>">
+    <!-- Top bar -->
+    <div class="topbar">
+      <h1>Edit Employee</h1>
+      <div class="topbar-user">
+        <div class="avatar">
+          <?php echo strtoupper(substr($_SESSION["username"], 0, 1)); ?>
+        </div>
+        <span><?php echo $_SESSION["username"]; ?></span>
+      </div>
+    </div>
 
-    <label>Name</label><br>
-    <input type="text" name="name" 
-           value="<?php echo $employee["name"]; ?>"><br><br>
+    <!-- Page content -->
+    <div class="content">
 
-    <label>Job Title</label><br>
-    <input type="text" name="job_title" 
-           value="<?php echo $employee["job_title"]; ?>"><br><br>
+      <div class="page-header">
+        <h2>Edit Employee</h2>
+        <a href="employees.php" class="btn btn-secondary">Back to Employees</a>
+      </div>
 
-    <label>Status</label><br>
-    <select name="status">
-      <option value="active" 
-        <?php if ($employee["status"] == "active") echo "selected"; ?>>
-        Active
-      </option>
-      <option value="inactive" 
-        <?php if ($employee["status"] == "inactive") echo "selected"; ?>>
-        Inactive
-      </option>
-    </select><br><br>
+      <?php if ($error): ?>
+        <div class="alert alert-error"><?php echo $error; ?></div>
+      <?php endif; ?>
 
-    <button type="submit">Save Changes</button>
+      <?php if ($success): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+      <?php endif; ?>
 
-  </form>
+      <div class="card">
+        <form method="POST" action="edit_employee.php?id=<?php echo $id; ?>">
+
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="name"
+                   value="<?php echo $employee["name"]; ?>">
+          </div>
+
+          <div class="form-group">
+            <label>Job Title</label>
+            <input type="text" name="job_title"
+                   value="<?php echo $employee["job_title"]; ?>">
+          </div>
+
+          <div class="form-group">
+            <label>Status</label>
+            <select name="status">
+              <option value="active"
+                <?php if ($employee["status"] == "active") echo "selected"; ?>>
+                Active
+              </option>
+              <option value="inactive"
+                <?php if ($employee["status"] == "inactive") echo "selected"; ?>>
+                Inactive
+              </option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+
+        </form>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-content -->
+</div><!-- /page-wrapper -->
 
 </body>
 </html>

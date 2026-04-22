@@ -11,40 +11,72 @@ if (!isset($_SESSION["user_id"])) {
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Dashboard — HR-ECS</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <h1>Welcome, <?php echo $_SESSION["username"]; ?>!</h1>
-  <p>Role: <?php echo $_SESSION["role"]; ?></p>
+<div class="page-wrapper">
 
-  <?php if ($_SESSION["role"] == "admin"): ?>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">HR</div>
+      <span>HR-ECS</span>
+    </div>
+    <nav>
+      <a href="dashboard.php" class="active">Dashboard</a>
+      <?php if ($_SESSION["role"] == "admin" || $_SESSION["role"] == "manager"): ?>
+        <a href="employees.php">Employees</a>
+      <?php endif; ?>
+      <a href="leave.php">Leave Requests</a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="logout.php">Logout</a>
+    </div>
+  </aside>
 
-    <h2>Admin Panel</h2>
-    <ul>
-      <li><a href="employees.php">Manage Employees</a></li>
-      <li><a href="leave.php">Manage Leave Requests</a></li>
-    </ul>
+  <!-- Main content -->
+  <div class="main-content">
 
-  <?php elseif ($_SESSION["role"] == "manager"): ?>
+    <!-- Top bar -->
+    <div class="topbar">
+      <h1>Dashboard</h1>
+      <div class="topbar-user">
+        <div class="avatar">
+          <?php echo strtoupper(substr($_SESSION["username"], 0, 1)); ?>
+        </div>
+        <span><?php echo $_SESSION["username"]; ?></span>
+      </div>
+    </div>
 
-    <h2>Manager Panel</h2>
-    <ul>
-      <li><a href="employees.php">View Employees</a></li>
-      <li><a href="leave.php">Review Leave Requests</a></li>
-    </ul>
+    <!-- Page content -->
+    <div class="content">
 
-  <?php else: ?>
+      <div class="page-header">
+        <h2>Welcome, <?php echo $_SESSION["username"]; ?>!</h2>
+      </div>
 
-    <h2>Employee Panel</h2>
-    <ul>
-      <li><a href="leave.php">My Leave Requests</a></li>
-    </ul>
+      <div class="card">
+        <p>Role: <strong><?php echo ucfirst($_SESSION["role"]); ?></strong></p>
+        <br>
 
-  <?php endif; ?>
+        <?php if ($_SESSION["role"] == "admin"): ?>
+          <a href="employees.php" class="btn btn-primary">Manage Employees</a>
 
-  <br>
-  <a href="logout.php">Logout</a>
+        <?php elseif ($_SESSION["role"] == "manager"): ?>
+          <a href="employees.php" class="btn btn-primary">View Employees</a>
+
+        <?php else: ?>
+          <a href="leave.php" class="btn btn-primary">My Leave Requests</a>
+
+        <?php endif; ?>
+      </div>
+
+    </div><!-- /content -->
+  </div><!-- /main-content -->
+</div><!-- /page-wrapper -->
 
 </body>
 </html>
